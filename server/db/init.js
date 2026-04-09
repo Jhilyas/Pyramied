@@ -3,8 +3,17 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'pyramied.db');
+let DB_PATH = path.join(__dirname, 'pyramied.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
+
+// Hugging Face Persistent Storage detection
+const HF_DATA_DIR = '/data';
+if (fs.existsSync(HF_DATA_DIR)) {
+  DB_PATH = path.join(HF_DATA_DIR, 'pyramied.db');
+  console.log('[DB] Hugging Face Persistent Storage detected. Using:', DB_PATH);
+} else if (process.env.DB_PATH) {
+  DB_PATH = process.env.DB_PATH;
+}
 
 let db = null;
 

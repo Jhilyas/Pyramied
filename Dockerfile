@@ -11,6 +11,7 @@ RUN npm install --production
 # Copy server
 COPY server/ ./server/
 RUN cd server && npm install --production
+RUN mkdir -p /data && chmod 777 /data
 
 # Copy client and build
 COPY client/ ./client/

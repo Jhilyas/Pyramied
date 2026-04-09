@@ -17,7 +17,7 @@ async function startServer() {
 
   // Session config
   const sessionMiddleware = session({
-    secret: 'pyramied-secret-key-change-in-production',
+    secret: process.env.SESSION_SECRET || 'pyramied-dev-secret-keep-secure',
     resave: false,
     saveUninitialized: false,
     cookie: {
