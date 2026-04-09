@@ -8,6 +8,8 @@
     "dev:server": "cd server && node index.js",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "install:all": "cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm install && npm run build",
+    "start": "cd server && node index.js",
     "db:init": "cd server && node db/init.js"
   },
   "devDependencies": {

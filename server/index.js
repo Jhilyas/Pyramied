@@ -53,6 +53,7 @@ async function startServer() {
   const forumsRouter = require('./routes/forums');
   const messagesRouter = require('./routes/messages');
   const settingsRouter = require('./routes/settings');
+  const aiRouter = require('./routes/ai');
 
   app.use('/api/users', requireAuth, requireTeacher, usersRouter);
   app.use('/api/courses', requireAuth, coursesRouter);
@@ -62,6 +63,7 @@ async function startServer() {
   app.use('/api/forums', requireAuth, forumsRouter);
   app.use('/api/messages', requireAuth, messagesRouter);
   app.use('/api/settings', settingsRouter);
+  app.use('/api/ai', requireAuth, aiRouter);
 
   // ========================
   // SOCKET.IO
@@ -167,6 +169,17 @@ async function startServer() {
     const users = Array.from(presenceStore.values()).filter((u) => !u.isTeacher);
     io.emit('presence:update', users);
   }
+
+  // ========================
+  // SERVE FRONTEND IN PRODUCTION
+  // ========================
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/socket.io') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(clientDist, 'index.html'));
+    }
+  });
 
   // ========================
   // START SERVER

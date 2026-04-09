@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pyramied
+    runtime: node
+    buildCommand: npm install && cd client && npm install && npm run build && cd ../server && npm install
+    startCommand: cd server && node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENROUTER_API_KEY
+        sync: false

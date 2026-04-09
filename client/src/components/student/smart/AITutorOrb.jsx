@@ -4,9 +4,10 @@ import { LiquidGlass } from '@/components/ui/liquid-glass';
 export default function AITutorOrb() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: 'tutor', text: 'Hello! I am your AI Tutor. Need help with the lesson?' }
+    { sender: 'tutor', text: 'Hello! I am your Pyramied AI Tutor. Ask me anything about your lessons!' }
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   const orbStyle = {
@@ -49,21 +50,32 @@ export default function AITutorOrb() {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
     
-    const newMsg = { sender: 'user', text: input };
-    setMessages(prev => [...prev, newMsg]);
+    const userMsg = { sender: 'user', text: input };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput('');
+    setLoading(true);
 
-    // Mock response
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: updatedMessages }),
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { sender: 'tutor', text: data.reply }]);
+    } catch (err) {
       setMessages(prev => [...prev, { 
         sender: 'tutor', 
-        text: 'That is a great question. In this lesson, focus on the core concepts and try to summarize what you just read in your own words.' 
+        text: 'Sorry, I could not connect. Please try again.' 
       }]);
-    }, 1000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,7 +91,7 @@ export default function AITutorOrb() {
       <LiquidGlass variant="solid" className="liquid-glass-green" style={panelStyle}>
         <div style={{ padding: 'var(--space-md)', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(52, 199, 89, 0.1)' }}>
           <h3 style={{ margin: 0, fontSize: 'var(--font-size-md)', fontWeight: 600 }}>Pyramied AI Tutor</h3>
-          <p style={{ margin: 0, fontSize: 'var(--font-size-xs)', opacity: 0.8 }}>Always here to help</p>
+          <p style={{ margin: 0, fontSize: 'var(--font-size-xs)', opacity: 0.8 }}>Powered by Llama 3.3 · Always here to help</p>
         </div>
         
         <div style={{ flex: 1, padding: 'var(--space-md)', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
@@ -93,10 +105,24 @@ export default function AITutorOrb() {
               fontSize: 'var(--font-size-sm)',
               borderBottomRightRadius: m.sender === 'user' ? '2px' : '12px',
               borderBottomLeftRadius: m.sender === 'tutor' ? '2px' : '12px',
+              whiteSpace: 'pre-wrap',
             }}>
               {m.text}
             </div>
           ))}
+          {loading && (
+            <div style={{ 
+              alignSelf: 'flex-start',
+              background: 'rgba(255,255,255,0.05)',
+              padding: '8px 12px',
+              borderRadius: '12px',
+              fontSize: 'var(--font-size-sm)',
+              borderBottomLeftRadius: '2px',
+              opacity: 0.7,
+            }}>
+              <span className="typing-dots">Thinking...</span>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
@@ -108,8 +134,11 @@ export default function AITutorOrb() {
               placeholder="Ask a question..."
               value={input}
               onChange={e => setInput(e.target.value)}
+              disabled={loading}
             />
-            <button type="submit" className="btn btn-primary btn-sm" style={{ height: '36px' }}>➔</button>
+            <button type="submit" className="btn btn-primary btn-sm" style={{ height: '36px' }} disabled={loading}>
+              {loading ? '...' : '➔'}
+            </button>
           </form>
         </div>
       </LiquidGlass>
