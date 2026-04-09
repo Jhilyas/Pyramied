@@ -1,0 +1,196 @@
+/* ==========================================
+   PYRAMIED — Liquid Glass Effects
+   Apple-inspired glassmorphism with SVG refraction
+   ========================================== */
+
+/* Base glass surface */
+.liquid-glass {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base),
+    border-color var(--transition-base);
+  overflow: hidden;
+}
+
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  pointer-events: none;
+}
+
+.liquid-glass:hover {
+  box-shadow: var(--glass-shadow-hover);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Solid glass variant — more opaque for readability */
+.liquid-glass-solid {
+  position: relative;
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+  overflow: hidden;
+}
+
+.liquid-glass-solid::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  pointer-events: none;
+}
+
+/* Elevated glass — for cards that need to pop */
+.liquid-glass-elevated {
+  position: relative;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.liquid-glass-elevated:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Interactive glass — for clickable cards */
+.liquid-glass-interactive {
+  cursor: pointer;
+}
+
+.liquid-glass-interactive:active {
+  transform: scale(0.98);
+}
+
+/* Navbar glass — fixed with extra blur */
+.liquid-glass-nav {
+  position: relative;
+  background: rgba(250, 249, 246, 0.72);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all var(--transition-base);
+}
+
+/* Sidebar glass */
+.liquid-glass-sidebar {
+  position: relative;
+  background: rgba(250, 249, 246, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Modal glass */
+.liquid-glass-modal {
+  position: relative;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+/* SVG filter container (hidden) — injected by LiquidGlass component */
+.liquid-glass-svg-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Liquid distortion overlay */
+.liquid-glass-distortion {
+  position: absolute;
+  inset: 0;
+  filter: url(#liquid-distortion);
+  pointer-events: none;
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* Ensure content sits above the distortion */
+.liquid-glass > *:not(.liquid-glass-distortion):not(.liquid-glass-svg-filter) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Inner glow for green-tinted glass */
+.liquid-glass-green {
+  background: rgba(52, 199, 89, 0.08);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.liquid-glass-green::after {
+  background: linear-gradient(
+    180deg,
+    rgba(52, 199, 89, 0.06) 0%,
+    rgba(52, 199, 89, 0) 100%
+  );
+}
+
+/* Presence dot */
+.presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+  animation: presence-pulse 2s ease-in-out infinite;
+}
+
+.presence-dot-offline {
+  background-color: var(--color-text-muted);
+  box-shadow: none;
+  animation: none;
+}
+
+@keyframes presence-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(52, 199, 89, 0.6); }
+  50% { opacity: 0.7; box-shadow: 0 0 12px rgba(52, 199, 89, 0.3); }
+}
